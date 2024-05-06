@@ -37,7 +37,7 @@ public:
 
     void setHealth(int newHealth);
 
-	void update(sf::RenderWindow& window, const sf::Event& event);
+	void update(sf::RenderWindow& window);
 	void handleCollision(Robot& other);
 
 	void draw(sf::RenderWindow& window);

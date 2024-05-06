@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include "Robot.hpp"
 
 // Constructeur
@@ -52,32 +53,50 @@ void Robot::moveRight() {
     posX = std::min(600.0f, posX + speed);
 }
 
-void Robot::update(sf::RenderWindow& window, const sf::Event& event) {
-	saveLastPosition();
+void Robot::update(sf::RenderWindow& window) {
     if (controlScheme == 'A') {
-        if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Up) moveUp();
-            if (event.key.code == sf::Keyboard::Down) moveDown();
-            if (event.key.code == sf::Keyboard::Left) moveLeft();
-            if (event.key.code == sf::Keyboard::Right) moveRight();
-        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) moveUp();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) moveDown();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) moveLeft();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) moveRight();
     } else if (controlScheme == 'B') {
-        if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Z) moveUp();
-            if (event.key.code == sf::Keyboard::S) moveDown();
-            if (event.key.code == sf::Keyboard::Q) moveLeft();
-            if (event.key.code == sf::Keyboard::D) moveRight();
-        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z)) moveUp();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) moveDown();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) moveLeft();
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) moveRight();
     }
 }
 
 void Robot::handleCollision(Robot& other) {
     if (this->getX() < other.getX() + 50 && this->getX() + 50 > other.getX() &&
         this->getY() < other.getY() + 50 && this->getY() + 50 > other.getY()) {
-        revertToLastPosition(); // Revenir à la dernière position sûre
-        other.revertToLastPosition();
+
+        // Calcul de la direction de recul
+        float deltaX = posX - other.posX;
+        float deltaY = posY - other.posY;
+        float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        // Normalisation du vecteur de recul
+        if (distance != 0) {
+            deltaX /= distance;
+            deltaY /= distance;
+        }
+
+        // Appliquer un léger recul
+        float recul = 5.0f; // Vous pouvez ajuster ce paramètre selon le besoin
+        posX += deltaX * recul;
+        posY += deltaY * recul;
+        other.posX -= deltaX * recul;
+        other.posY -= deltaY * recul;
+
+        // Vérifier les limites de la fenêtre pour chaque robot
+        posX = std::min(std::max(0.0f, posX), 800.0f - 50.0f); // Largeur de fenêtre moins largeur de robot
+        posY = std::min(std::max(0.0f, posY), 600.0f - 50.0f); // Hauteur de fenêtre moins hauteur de robot
+        other.posX = std::min(std::max(0.0f, other.posX), 800.0f - 50.0f);
+        other.posY = std::min(std::max(0.0f, other.posY), 600.0f - 50.0f);
     }
 }
+
 
 void Robot::draw(sf::RenderWindow& window) {
     sf::RectangleShape shape(sf::Vector2f(50.0f, 50.0f));  // La taille devrait être un membre de la classe Robot

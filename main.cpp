@@ -7,11 +7,11 @@ int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
     sf::RenderWindow window(sf::VideoMode(800, 600), "Robot and Hexagon Arena");
     sf::Clock clock;
-    const sf::Time timePerMove = sf::milliseconds(100);
+    const sf::Time timePerMove = sf::milliseconds(100);  // Définir l'intervalle de mise à jour
 
     // Création des robots
-    Robot robot1(400, 300, 100, 5, 20, 10, 'A', sf::Color::Red); // 'A' pour les flèches
-    Robot robot2(200, 300, 100, 5, 15, 10, 'B', sf::Color::Blue); // 'B' pour ZQSD
+    Robot robot1(400, 300, 100, 5, 20, 10, 'A', sf::Color::Red);
+    Robot robot2(200, 300, 100, 5, 15, 10, 'B', sf::Color::Blue);
     Hexagone hexagon(window.getSize().x, window.getSize().y);
 
     while (window.isOpen()) {
@@ -20,16 +20,18 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-
-            robot1.update(window, event);
-            robot2.update(window, event);
         }
 
-        if (clock.getElapsedTime() > timePerMove) {
-            clock.restart();
+        if (clock.getElapsedTime() >= timePerMove) {
+            // Mettre à jour les mouvements des robots seulement quand l'intervalle de temps est atteint
+            robot1.update(window);
+            robot2.update(window);
+
             // Vérification des collisions entre les robots
             robot1.handleCollision(robot2);
             robot2.handleCollision(robot1);
+
+            clock.restart();  // Redémarrer l'horloge après chaque mise à jour
         }
 
         window.clear(sf::Color::White);
@@ -41,5 +43,3 @@ int main() {
 
     return 0;
 }
-
-
