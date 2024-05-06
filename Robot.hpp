@@ -2,12 +2,14 @@
 #define ROBOT_HPP
 
 #include <SFML/Graphics.hpp>
-
+#include "bonus.hpp"
 class Robot {
 public:
     // Constructeur
     Robot(float x, float y, int health, float speed, int attackPower, int defense, char controlScheme, sf::Color color);
-
+	
+	
+	
     // Destructeur
     virtual ~Robot();
 
@@ -20,13 +22,13 @@ public:
 	void setPosition(float x, float y);
 
 	void saveLastPosition() {
-        lastPosX = posX;
-        lastPosY = posY;
+        lastPosX = position.x;
+        lastPosY = position.y;
     }
 
 	void revertToLastPosition() {
-        posX = lastPosX;
-        posY = lastPosY;
+        position.x = lastPosX;
+        position.y = lastPosY;
     }
 
     // Getters et Setters
@@ -39,17 +41,21 @@ public:
 
 	void update(sf::RenderWindow& window);
 	void handleCollision(Robot& other);
+	void handleCollision(Bonus& other);
 
 	void draw(sf::RenderWindow& window);
-
+	sf::RectangleShape get_Shape(){
+		return rectangleShape;
+	}
 
 protected:
-    float posX, posY; // Position actuelle du robot
+    sf::Vector2f position;
     int health;       // Santé actuelle du robot
     float speed;      // Vitesse de déplacement du robot
     int attackPower;  // Puissance d'attaque
     int defense;      // Capacité de défense
 	float lastPosX, lastPosY;
+	sf::RectangleShape rectangleShape;
 	char controlScheme;  // 'A' pour les flèches, 'B' pour ZQSD
 	sf::Color color;
 };

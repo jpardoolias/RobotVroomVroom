@@ -9,9 +9,9 @@
 
 class Bonus {
 private:
-    sf::Vector2f position;
-    sf::CircleShape circleShape;
-    sf::RectangleShape rectangleShape;
+	sf::Vector2f position;
+	sf::CircleShape circleShape;
+	sf::RectangleShape rectangleShape;
 	sf::ConvexShape triangleShape;
 	std::string shape;
 	int type=rand()%4+1;
@@ -65,6 +65,19 @@ public:
                 break;
         }
     }
+	sf::Vector2f get_position(){
+		return position;
+	}
+    sf::CircleShape get_circleShape(){
+		return circleShape;
+	}
+    sf::RectangleShape get_rectangleShape(){
+		return rectangleShape;
+	}
+	sf::ConvexShape get_triangleShape(){
+		return triangleShape;
+	}
+
 	std::string get_shape(){
 		return shape;
 	}

@@ -2,6 +2,8 @@
 #include "Robot.hpp"
 #include "arene.hpp"
 #include <iostream>
+#include "bonus.hpp"
+
 
 int main() {
     srand(static_cast<unsigned int>(time(nullptr)));
@@ -13,6 +15,7 @@ int main() {
     Robot robot1(400, 300, 100, 5, 20, 10, 'A', sf::Color::Red);
     Robot robot2(200, 300, 100, 5, 15, 10, 'B', sf::Color::Blue);
     Hexagone hexagon(window.getSize().x, window.getSize().y);
+	Bonus bonus(hexagon);
 
     while (window.isOpen()) {
         sf::Event event;
@@ -35,7 +38,8 @@ int main() {
         }
 
         window.clear(sf::Color::White);
-        hexagon.drawHexagon(window, sf::Color::Green);  // Dessiner l'hexagone
+        hexagon.drawHexagon(window, sf::Color::Green); 
+		bonus.drawBonus(window); // Dessiner l'hexagone
         robot1.draw(window);  // Dessiner le premier robot
         robot2.draw(window);  // Dessiner le deuxième robot
         window.display();

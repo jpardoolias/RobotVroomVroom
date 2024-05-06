@@ -4,24 +4,31 @@
 
 // Constructeur
 Robot::Robot(float x, float y, int health, float speed, int attackPower, int defense,char controlScheme, sf::Color color)
-    : posX(x), posY(y), health(health), speed(speed), attackPower(attackPower), defense(defense), controlScheme(controlScheme), color(color){}
+    : health(health), speed(speed), attackPower(attackPower), defense(defense), controlScheme(controlScheme){
+		rectangleShape.setSize(sf::Vector2f(40, 40));
+		rectangleShape.setFillColor( color);
+		rectangleShape.setOutlineThickness(2);
+		rectangleShape.setOutlineColor(sf::Color::Black);
+		rectangleShape.setOrigin(20, 20); // Origine au centre du rectangle
+		rectangleShape.setPosition(position);
+		}
 
 // Destructeur
 
 Robot::~Robot() {}
 
 void Robot::setPosition(float x, float y) {
-    posX = x;
-    posY = y;
+    position.x = x;
+    position.y = y;
 }
 
 // Getters
 float Robot::getX() const {
-    return posX;
+    return position.x;
 }
 
 float Robot::getY() const {
-    return posY;
+    return position.y;
 }
 
 int Robot::getHealth() const {
@@ -38,19 +45,19 @@ void Robot::setHealth(int newHealth) {
 }
 
 void Robot::moveUp() {
-    posY = std::max(0.0f, posY - speed);
+    position.y = std::max(0.0f, position.y - speed);
 }
 
 void Robot::moveDown() {
-    posY = std::min(600.0f, posY + speed);
+    position.y = std::min(600.0f, position.y + speed);
 }
 
 void Robot::moveLeft() {
-    posX = std::max(0.0f, posX - speed);
+    position.x = std::max(0.0f, position.x - speed);
 }
 
 void Robot::moveRight() {
-    posX = std::min(600.0f, posX + speed);
+    position.x = std::min(600.0f, position.x + speed);
 }
 
 void Robot::update(sf::RenderWindow& window) {
@@ -72,8 +79,8 @@ void Robot::handleCollision(Robot& other) {
         this->getY() < other.getY() + 50 && this->getY() + 50 > other.getY()) {
 
         // Calcul de la direction de recul
-        float deltaX = posX - other.posX;
-        float deltaY = posY - other.posY;
+        float deltaX = position.x - other.position.x;
+        float deltaY = position.y - other.position.y;
         float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
         // Normalisation du vecteur de recul
@@ -84,23 +91,60 @@ void Robot::handleCollision(Robot& other) {
 
         // Appliquer un léger recul
         float recul = 5.0f; // Vous pouvez ajuster ce paramètre selon le besoin
-        posX += deltaX * recul;
-        posY += deltaY * recul;
-        other.posX -= deltaX * recul;
-        other.posY -= deltaY * recul;
+        position.x += deltaX * recul;
+        position.y+= deltaY * recul;
+        other.position.x -= deltaX * recul;
+        other.position.y -= deltaY * recul;
 
         // Vérifier les limites de la fenêtre pour chaque robot
-        posX = std::min(std::max(0.0f, posX), 800.0f - 50.0f); // Largeur de fenêtre moins largeur de robot
-        posY = std::min(std::max(0.0f, posY), 600.0f - 50.0f); // Hauteur de fenêtre moins hauteur de robot
-        other.posX = std::min(std::max(0.0f, other.posX), 800.0f - 50.0f);
-        other.posY = std::min(std::max(0.0f, other.posY), 600.0f - 50.0f);
+        position.x = std::min(std::max(0.0f, position.x), 800.0f - 50.0f); // Largeur de fenêtre moins largeur de robot
+        position.y = std::min(std::max(0.0f, position.y), 600.0f - 50.0f); // Hauteur de fenêtre moins hauteur de robot
+        other.position.x = std::min(std::max(0.0f, other.position.x), 800.0f - 50.0f);
+        other.position.y = std::min(std::max(0.0f, other.position.y), 600.0f - 50.0f);
+    }
+}
+
+void Robot::handleCollision(Bonus& bonus) {
+
+    // Obtenir les limites globales des formes
+    sf::FloatRect robotBounds = get_Shape().getGlobalBounds();
+    sf::FloatRect bonusBounds;
+
+    if (bonus.get_shape() == "circle") {
+        // Obtenir les limites globales du cercle
+        sf::FloatRect circleBounds = bonus.get_circleShape().getGlobalBounds();
+
+        // Vérifier la collision entre le robot et le cercle
+        if (robotBounds.intersects(circleBounds)) {
+            revertToLastPosition(); // Revenir à la dernière position sûre
+            // Autres actions à effectuer en cas de collision avec un cercle
+        }
+    } else if (bonus.get_shape() == "rectangle") {
+        // Obtenir les limites globales du rectangle
+        sf::FloatRect rectangleBounds = bonus.get_rectangleShape().getGlobalBounds();
+
+        // Vérifier la collision entre le robot et le rectangle
+        if (robotBounds.intersects(rectangleBounds)) {
+            revertToLastPosition(); // Revenir à la dernière position sûre
+            // Autres actions à effectuer en cas de collision avec un rectangle
+        }
+    } else if (bonus.get_shape() == "triangle") {
+        // Obtenir les limites globales du triangle
+        sf::FloatRect triangleBounds = bonus.get_triangleShape().getGlobalBounds();
+
+        // Vérifier la collision entre le robot et le triangle
+        if (robotBounds.intersects(triangleBounds)) {
+            revertToLastPosition(); // Revenir à la dernière position sûre
+            // Autres actions à effectuer en cas de collision avec un triangle
+        }
     }
 }
 
 
+
 void Robot::draw(sf::RenderWindow& window) {
     sf::RectangleShape shape(sf::Vector2f(50.0f, 50.0f));  // La taille devrait être un membre de la classe Robot
-    shape.setPosition(posX, posY);
+    shape.setPosition(position.x, position.y);
     shape.setFillColor(color);  // La couleur pourrait aussi être un attribut de Robot
     window.draw(shape);
 }
