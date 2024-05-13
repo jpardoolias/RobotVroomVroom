@@ -13,7 +13,7 @@ Robot::Robot(Hexagone& hex, float x, float y, int health, float speed, int attac
 		rectangleShape.setPosition(position);
 		}
 
-// Destructeur
+// Destructeurbarrière
 
 Robot::~Robot() {}
 
