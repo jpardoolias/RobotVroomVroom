@@ -1,5 +1,5 @@
 # Nom du fichier exécutable
-TARGET = RobotArena
+TARGET = RobotArena 
 
 # Compilateur C++
 CXX = g++
@@ -20,7 +20,7 @@ OBJECTS = $(SOURCES:.cpp=.o)
 SFML_LIBS = -lsfml-graphics -lsfml-window -lsfml-system
 
 # Règle par défaut pour créer l'exécutable
-all: $(TARGET)
+all: $(TARGET) clean
 
 # Lier les fichiers objets pour créer l'exécutable
 $(TARGET): $(OBJECTS)
