@@ -7,6 +7,7 @@
 #include "arene.hpp"
 
 
+
 class Bonus {
 private:
 	sf::Vector2f position;
