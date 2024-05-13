@@ -3,14 +3,13 @@
 #include "Robot.hpp"
 
 // Constructeur
-
-Robot::Robot(float x, float y, int health, float speed, int attackPower, int defense,char controlScheme, sf::Color color)
-    : health(health), speed(speed), attackPower(attackPower), defense(defense), controlScheme(controlScheme){
-		rectangleShape.setSize(sf::Vector2f(40, 40));
-		rectangleShape.setFillColor( color);
+Robot::Robot(Hexagone& hex, float x, float y, int health, float speed, int attackPower, int defense,char controlScheme, sf::Color color)
+    : hexagon(hex), position(x,y), health(health), speed(speed), attackPower(attackPower), defense(defense), controlScheme(controlScheme){
+		rectangleShape.setSize(sf::Vector2f(width, height));
+		rectangleShape.setFillColor(color);
 		rectangleShape.setOutlineThickness(2);
 		rectangleShape.setOutlineColor(color);
-		rectangleShape.setOrigin(20, 20); // Origine au centre du rectangle
+		rectangleShape.setOrigin(width/2,height/2);
 		rectangleShape.setPosition(position);
 		}
 
@@ -21,6 +20,7 @@ Robot::~Robot() {}
 void Robot::setPosition(float x, float y) {
     position.x = x;
     position.y = y;
+	rectangleShape.setPosition(x, y);
 }
 
 // Getters
@@ -46,22 +46,35 @@ void Robot::setHealth(int newHealth) {
 }
 
 void Robot::moveUp() {
-    position.y = std::max(0.0f, position.y - speed);
+    float newY = position.y - speed;
+    if (canMove(position.x, newY)) {
+        position.y = newY;
+    }
 }
 
 void Robot::moveDown() {
-    position.y = std::min(600.0f, position.y + speed);
+    float newY = position.y + speed;
+    if (canMove(position.x, newY)) {
+        position.y = newY;
+    }
 }
 
 void Robot::moveLeft() {
-    position.x = std::max(0.0f, position.x - speed);
+    float newX = position.x - speed;
+    if (canMove(newX, position.y)) {
+        position.x = newX;
+    }
 }
 
 void Robot::moveRight() {
-    position.x = std::min(800.0f, position.x + speed);
+    float newX = position.x + speed;
+    if (canMove(newX, position.y)) {
+        position.x = newX;
+    }
 }
 
 void Robot::update(sf::RenderWindow& window) {
+	saveLastPosition();
     if (controlScheme == 'A') {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) moveUp();
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) moveDown();
@@ -76,32 +89,43 @@ void Robot::update(sf::RenderWindow& window) {
 }
 
 void Robot::handleCollision(Robot& other) {
-    if (this->getX() < other.getX() + 50 && this->getX() + 50 > other.getX() &&
-        this->getY() < other.getY() + 50 && this->getY() + 50 > other.getY()) {
+    if (this->getX() < other.getX() + width && this->getX() + width > other.getX() &&
+        this->getY() < other.getY() + height && this->getY() + height > other.getY()) {
 
-        // Calcul de la direction de recul
+        // Calculate the direction of recoil
         float deltaX = position.x - other.position.x;
         float deltaY = position.y - other.position.y;
         float distance = std::sqrt(deltaX * deltaX + deltaY * deltaY);
 
-        // Normalisation du vecteur de recul
+        // Normalize the recoil vector
         if (distance != 0) {
             deltaX /= distance;
             deltaY /= distance;
         }
 
-        // Appliquer un léger recul
-        float recul = 5.0f; // Vous pouvez ajuster ce paramètre selon le besoin
-        position.x += deltaX * recul;
-        position.y+= deltaY * recul;
-        other.position.x -= deltaX * recul;
-        other.position.y -= deltaY * recul;
+        // Apply a slight recoil
+        float recoil = 5.0f; // You may adjust this parameter based on needs
+        position.x += deltaX * recoil;
+        position.y += deltaY * recoil;
+        other.position.x -= deltaX * recoil;
+        other.position.y -= deltaY * recoil;
 
-        // Vérifier les limites de la fenêtre pour chaque robot
-        position.x = std::min(std::max(0.0f, position.x), 800.0f - 50.0f); // Largeur de fenêtre moins largeur de robot
-        position.y = std::min(std::max(0.0f, position.y), 600.0f - 50.0f); // Hauteur de fenêtre moins hauteur de robot
-        other.position.x = std::min(std::max(0.0f, other.position.x), 800.0f - 50.0f);
-        other.position.y = std::min(std::max(0.0f, other.position.y), 600.0f - 50.0f);
+        // Ensure both robots remain inside the hexagon
+		if(!canMove(position.x,position.y)) revertToLastPosition();
+		if(!canMove(other.position.x,other.position.y)) other.revertToLastPosition();
+
+        /*ensureInsideBoundary(position);
+        ensureInsideBoundary(other.position);*/
+    }
+}
+
+void Robot::ensureInsideBoundary(sf::Vector2f& pos) {
+    // Check all corners of the robot's bounding box
+    if (!hexagon.isInside(pos.x, pos.y) ||
+        !hexagon.isInside(pos.x + width, pos.y) ||
+        !hexagon.isInside(pos.x, pos.y + height) ||
+        !hexagon.isInside(pos.x + width, pos.y + height)) {
+        revertToLastPosition();
     }
 }
 
@@ -144,8 +168,20 @@ void Robot::handleCollision(Bonus& bonus) {
 
 
 void Robot::draw(sf::RenderWindow& window) {
-    sf::RectangleShape shape(sf::Vector2f(50.0f, 50.0f));  // La taille devrait être un membre de la classe Robot
+    sf::RectangleShape shape(sf::Vector2f(width, height));
     shape.setPosition(position.x, position.y);
     shape.setFillColor(color);  // La couleur pourrait aussi être un attribut de Robot
     window.draw(shape);
+}
+
+bool Robot::canMove(float newX, float newY) {
+    sf::Vector2f newTopLeft(newX, newY);
+    sf::Vector2f newTopRight(newX + width, newY );
+    sf::Vector2f newBottomLeft(newX, newY + height);
+    sf::Vector2f newBottomRight(newX + width, newY + height);
+
+    return hexagon.isInside(newTopLeft.x, newTopLeft.y) &&
+           hexagon.isInside(newTopRight.x, newTopRight.y) &&
+           hexagon.isInside(newBottomLeft.x, newBottomLeft.y) &&
+           hexagon.isInside(newBottomRight.x, newBottomRight.y);
 }
