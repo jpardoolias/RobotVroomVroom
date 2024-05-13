@@ -11,3 +11,4 @@ void Bonus::drawBonus(sf::RenderWindow& window) const{
             window.draw(triangleShape);
         }
     }
+	
