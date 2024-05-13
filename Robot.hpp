@@ -6,6 +6,7 @@
 class Robot {
 public:
     // Constructeur
+	Robot() {};
     Robot(float x, float y, int health, float speed, int attackPower, int defense, char controlScheme, sf::Color color);
 	
 	

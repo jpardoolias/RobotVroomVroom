@@ -11,6 +11,7 @@ private:
     sf::Vector2f points[7];
 
 public:
+	Hexagone() {};
     Hexagone(int windowWidth, int windowHeight) {
         float size = std::min(windowWidth, windowHeight) * 0.5f; // Taille de l'hexagone à 80% de la taille de la fenêtre
         float centerX = windowWidth / 2.0f;
@@ -23,6 +24,13 @@ public:
         // Fermer l'hexagone en connectant le dernier point au premier point
         points[6] = points[0];
     }
+	Hexagone(Hexagone &hex){
+		for (int i = 0; i < 7; ++i) {
+			points[i] = hex.points[i];
+		}
+
+
+	}
 
     bool isInside(float x, float y) const ;
 

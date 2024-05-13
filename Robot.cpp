@@ -3,12 +3,13 @@
 #include "Robot.hpp"
 
 // Constructeur
+
 Robot::Robot(float x, float y, int health, float speed, int attackPower, int defense,char controlScheme, sf::Color color)
     : health(health), speed(speed), attackPower(attackPower), defense(defense), controlScheme(controlScheme){
 		rectangleShape.setSize(sf::Vector2f(40, 40));
 		rectangleShape.setFillColor( color);
 		rectangleShape.setOutlineThickness(2);
-		rectangleShape.setOutlineColor(sf::Color::Black);
+		rectangleShape.setOutlineColor(color);
 		rectangleShape.setOrigin(20, 20); // Origine au centre du rectangle
 		rectangleShape.setPosition(position);
 		}
@@ -57,7 +58,7 @@ void Robot::moveLeft() {
 }
 
 void Robot::moveRight() {
-    position.x = std::min(600.0f, position.x + speed);
+    position.x = std::min(800.0f, position.x + speed);
 }
 
 void Robot::update(sf::RenderWindow& window) {
