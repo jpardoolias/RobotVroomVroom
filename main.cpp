@@ -18,14 +18,12 @@ int main() {
     Robot robot1(400, 300, 100, 2, 20, 10, 'A', sf::Color::Red);
     Robot robot2(200, 300, 100, 2, 15, 10, 'B', sf::Color::Blue);
     Affiche aff(hexagone,  robot1,  robot2);
-	while(!aff.menu(window)){}
+	while(aff.menu(window)){}
 	
-		
-	while(aff.refresh(window,timePerMove,clock,event) && !aff.fin)
-		{	}
-		
+	if(!aff.fin){
 
-    
-
+		while(aff.refresh(window,timePerMove,clock,event)){}   
+		
+	}
     return 0;
 }

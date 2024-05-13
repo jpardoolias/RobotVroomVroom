@@ -14,7 +14,7 @@ Robot::Robot(float x, float y, int health, float speed, int attackPower, int def
 		rectangleShape.setPosition(position);
 		}
 
-// Destructeur
+// Destructeurbarrière
 
 Robot::~Robot() {}
 

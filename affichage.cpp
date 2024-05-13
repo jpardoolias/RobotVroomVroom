@@ -48,6 +48,7 @@ bool Affiche::menu(sf::RenderWindow& window) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+				fin=true;
                 return false; // Retourne false si la fenêtre est fermée
             } else if (event.type == sf::Event::MouseButtonPressed) {
                 sf::Vector2f mousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
@@ -78,7 +79,7 @@ bool Affiche::menu(sf::RenderWindow& window) {
         window.draw(goButton);
         window.display();
     }
-	fin=true;
+	
     return false; // Retourne false par défaut
 }
 
@@ -114,9 +115,9 @@ bool Affiche::refresh(sf::RenderWindow& window,sf::Time timePerMove,sf::Clock cl
             clock.restart();  // Redémarrer l'horloge après chaque mise à jour
         }
 
-		window.clear(sf::Color::White);
+		window.clear(sf::Color::Black);
 		window.draw(sprite);
-        hexagon.drawHexagon(window, sf::Color::Green); 
+        hexagon.drawHexagon(window, sf::Color::Red); 
         P1.draw(window);  // Dessiner le premier robot
 		if(nbPlayers==2) P2.draw(window);  // Dessiner le deuxième robot
         window.display();

@@ -39,4 +39,5 @@ void Hexagone::drawHexagon(sf::RenderWindow& window, const sf::Color& color) con
         lines.append(sf::Vertex(points[i], color));
     }
     window.draw(lines);
+	
 }
